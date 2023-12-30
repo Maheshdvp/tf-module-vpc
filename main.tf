@@ -22,20 +22,19 @@ resource "aws_route" "igw" {
 
 }
 resource "aws_eip" "ngw" {
-  for_each = lookup(lookup(module.subnets,"public",null),"subnet_ids",null)
+  count = lookup(lookup(module.subnets,"public",null),"subnet_ids",null)
 
   domain   = "vpc"
 }
 resource "aws_nat_gateway" "ngw" {
-  for_each = local.private_subnet_ids
-
-  allocation_id = element(aws_eip.ngw.*.id,count.index )
-  subnet_id     = element(local.public_subnets_ids,count.index )
+  count = local.private_subnet_ids
+  allocation_id = element(aws_eip.ngw.*.id, count.index )
+  subnet_id     = element(local.public_subnets_ids, count.index )
 
   }
 
 resource "aws_route" "ngw" {
-  for_each = local.private_route_table_ids
+  count = local.private_route_table_ids
   route_table_id            = element(local.private_route_table_ids,count.index )
   destination_cidr_block    = "0.0.0.0/0"
   nat_gateway_id = element(aws_nat_gateway.ngw.*.id,count.index )
