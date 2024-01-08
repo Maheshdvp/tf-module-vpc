@@ -65,6 +65,7 @@ resource "aws_instance" "main" {
   instance_type = "t3.micro"
   image_id="ami-03265a0778a880afb"
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
+  subnet_id = local.app_subnets_ids[0]
 }
 
 resource "aws_security_group" "allow_tls" {
